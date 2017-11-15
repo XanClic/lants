@@ -314,26 +314,12 @@ class StatusScreen
         qin = dir_split(@queue)
 
         i = 0
-        dbi = din.length - h + 3
-        fbi = fin.length - h + 3
-        pbi = pin.length - h + 3
-        qbi = qin.length - h + 3
 
-        dbi = 0 if dbi < 0
-        fbi = 0 if fbi < 0
-        pbi = 0 if pbi < 0
-        qbi = 0 if qbi < 0
-
-        while din[dbi + i] || fin[fbi + i] || pin[pbi + i] || qin[qbi + i]
-            d = din[dbi + i]
-            f = fin[fbi + i]
-            p = pin[pbi + i]
-            q = qin[qbi + i]
-
-            d = d ? d : ''
-            f = f ? f : ''
-            p = p ? p : ''
-            q = q ? q : ''
+        while (din[i] || fin[i] || pin[i] || qin[i]) && i < h - 3
+            d = din[i] ? din[i] : ''
+            f = fin[i] ? fin[i] : ''
+            p = pin[i] ? pin[i] : ''
+            q = qin[i] ? qin[i] : ''
 
             self.write("%-*.*s%-*.*s%-*.*s%-*.*s\n" %
                        [w / 4, w / 4, d,
