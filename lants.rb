@@ -585,13 +585,17 @@ while jobs_completed.size < job_count
                              "#{job.short_name} [#{job.failcount}]")
             stat.failed(job.name)
 
+            machine = machines[job.machine]
+
             if job.failcount > 0
+                log_path = job_log_path(machine.host, job)
+                system("cp #{log_path.shellescape} " +
+                       "#{log_path.shellescape}.#{job.failcount}")
                 job.failcount -= 1
                 stat.enqueue(job.name, "#{job.short_name} [#{job.failcount}]")
                 jobs_running -= [job.name]
                 job_pool += [job.name]
             else
-                machine = machines[job.machine]
                 $stderr.puts("\n\n#{job.name} failed; see logs under " +
                              job_log_path(machine.host, job))
                 exit 1
