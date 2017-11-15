@@ -72,6 +72,8 @@ class Job
         end
 
         self.expand_dependencies
+
+        @machine = self.expand_params(@machine)
     end
 
     def expand_dependencies
@@ -89,6 +91,21 @@ class Job
 
             dep
         end
+    end
+
+    def expand_params(str, jobs=nil)
+        args = Hash[@arguments.map { |a| [a, $params[a].gsub('$', '$$')] }]
+        args['__jobs'] = jobs.to_s if jobs
+        args['__fname'] = job_fname(@machine, self).shellescape
+
+        str = str.dup
+        args.each do |a, v|
+            str.gsub!(/([^$])\$#{a}/, '\1' + v.gsub('\\', '\\\\'))
+            str.gsub!(/^\$#{a}/, v.gsub('\\', '\\\\'))
+        end
+        str.gsub!('$$', '$')
+
+        return str
     end
 
     def path
@@ -172,19 +189,8 @@ class Machine
     end
 
     def execute_job(job, jobs=1)
-        args = Hash[job.arguments.map { |a| [a, $params[a].gsub('$', '$$')] }]
-        args['__jobs'] = jobs.to_s
-        args['__fname'] = job_fname(@host, job).shellescape
-
-        execution = ['cd ' + job.workdir.shellescape] + job.execute.map { |l|
-            args.each do |a, v|
-                l.gsub!(/([^$])\$#{a}/, '\1' + v.gsub('\\', '\\\\'))
-                l.gsub!(/^\$#{a}/, v.gsub('\\', '\\\\'))
-            end
-            l.gsub!('$$', '$')
-
-            l
-        }
+        execution = ['cd ' + job.expand_params(job.workdir).shellescape] +
+                     job.execute.map { |l| job.expand_params(l) }
 
         pid = fork
         if !pid
@@ -383,8 +389,6 @@ $rcwd = File.realpath(Dir.pwd)
 
 system('mkdir -p ' + LOG_PATH.shellescape)
 
-stat = StatusScreen.new
-
 root = Job.new('root')
 root.path = $rcwd
 root.short_name = 'root'
@@ -392,10 +396,50 @@ root.short_name = 'root'
 all_jobs = { 'root' => root }
 unloaded_deps = [ 'root' ]
 
-stat.enqueue(root.name, root.short_name)
-
 ARGV.each do |arg|
-    if arg.include?('=')
+    if arg.start_with?('--')
+        p = arg[2..-1].split('=')
+        cmd = p[0]
+        arg = p[1..-1] * '='
+
+        case cmd
+        when 'param-file'
+            if arg.empty?
+                $stderr.puts('--param-file requires an argument')
+                exit 1
+            end
+            begin
+                params = JSON.parse(IO.read(arg))
+            rescue
+                $stderr.puts("Failed to read and parse parameter file #{arg}")
+                raise
+            end
+            if !params.kind_of?(Hash) ||
+               params.values.find { |v| !v.kind_of?(String) }
+                $stderr.puts("Parameter file #{arg} does not contain a JSON " +
+                             "with purely string values")
+                exit 1
+            end
+            $params = $params.merge(params)
+        when 'help'
+            $stderr.puts('Usage: lants.rb [options...] ' +
+                         '[root dependencies...] [parameters...]')
+            $stderr.puts
+            $stderr.puts('Options:')
+            $stderr.puts('  --param-file=<file>: Specifies a JSON file from ' +
+                         'which to read parameters')
+            $stderr.puts
+            $stderr.puts('root dependencies: Dependencies for the implicit ' +
+                         'root job')
+            $stderr.puts('  (i.e., list of jobs to execute)')
+            $stderr.puts
+            $stderr.puts('Parameters: Assignments of the form param=value')
+            exit
+        else
+            $stderr.puts("Unknown option --#{cmd}")
+            exit 1
+        end
+    elsif arg.include?('=')
         p = arg.split('=')
         $params[p[0].strip] = (p[1..-1] * '=').strip
     else
@@ -404,6 +448,10 @@ ARGV.each do |arg|
 end
 
 root.expand_dependencies
+
+
+stat = StatusScreen.new
+stat.enqueue(root.name, root.short_name)
 
 
 while !unloaded_deps.empty?
