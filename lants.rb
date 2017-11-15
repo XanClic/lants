@@ -266,63 +266,6 @@ class StatusScreen
         end
     end
 
-    #def hash_to_sorted_list(hash)
-    #    return hash unless hash.kind_of?(Hash)
-
-    #    hash.map { |k, v| [k, hash_to_sorted_list(v)] }
-    #end
-
-    #def remove_head(hash_arr)
-    #    while hash_arr.kind_of?(Array) && hash_arr.size == 1
-    #        hash_arr = hash_arr[0]
-    #    end
-    #    hash_arr
-    #end
-
-    #def collect(hash_arr, out=[], level=0)
-    #    if hash_arr == []
-    #        []
-    #    elsif hash_arr.kind_of?(Array)
-    #        collect(hash_arr[0], out, level)
-    #        hash_arr[0..-1].each do |e|
-    #            collect(e, out, level + 1)
-    #        end
-    #    elsif hash_arr.kind_of?(String)
-    #        out << (' ' * level + hash_arr)
-    #    else
-    #        raise 'Must be string or array'
-    #    end
-
-    #    out
-    #end
-
-    #def dir_split(list, aliased=false)
-    #    hash = {}
-    #    list.each do |le|
-    #        le = aliased ? le : @aliases[le]
-    #        path = le.split('/')
-    #        path_store(hash, '', path[0..-1], le)
-    #    end
-
-    #    hash = hash_to_sorted_list(hash)
-    #    hash = remove_head(hash)
-    #    hash = collect(hash)
-    #    p hash
-    #end
-
-    #def dir_split(list, aliased=false)
-    #    prefixes = {}
-    #    list.each do |le|
-    #        le = aliased ? le : @aliases[le]
-    #        path = le.split('/')
-    #        path_store(prefixes, '', path[0..-2], le)
-    #    end
-
-    #    prefixes = prefixes.values.sort
-    #    p prefixes
-    #    list
-    #end
-
     def dir_split(list, aliased=false)
         prefixes = { '/' => true }
         copy = list.map do |le|
