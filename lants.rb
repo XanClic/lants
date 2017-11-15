@@ -267,7 +267,7 @@ class StatusScreen
     end
 
     def dir_split(list, aliased=false)
-        if list.empty?
+        if list.empty? || (list.size == 1 && list[0] == 'root')
             return list
         end
 
