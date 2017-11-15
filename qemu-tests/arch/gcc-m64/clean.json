@@ -1,0 +1,7 @@
+{
+    "arguments": [ "arch_host", "arch_gcc_m64_dir" ],
+    "machine": "$arch_host",
+    "depends": [ "../branch" ],
+    "workdir": "$arch_gcc_m64_dir",
+    "execute": [ "make clean" ]
+}

@@ -1,0 +1,7 @@
+{
+    "arguments": [ "fedora_host", "fedora_mingw64_dir" ],
+    "machine": "$fedora_host",
+    "depends": [ "../branch" ],
+    "workdir": "$fedora_mingw64_dir",
+    "execute": [ "make clean" ]
+}

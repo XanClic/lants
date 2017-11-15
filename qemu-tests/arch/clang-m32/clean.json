@@ -1,0 +1,7 @@
+{
+    "arguments": [ "arch_host", "arch_clang_m32_dir" ],
+    "machine": "$arch_host",
+    "depends": [ "../branch" ],
+    "workdir": "$arch_clang_m32_dir",
+    "execute": [ "PKG_CONFIG_LIBDIR=/usr/lib32/pkgconfig make clean" ]
+}

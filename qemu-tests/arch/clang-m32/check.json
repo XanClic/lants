@@ -1,0 +1,9 @@
+{
+    "arguments": [ "arch_host", "arch_clang_m32_dir" ],
+    "machine": "$arch_host",
+    "variable_jobs": true,
+    "depends": [ "./make" ],
+    "workdir": "$arch_clang_m32_dir",
+    "execute": [ "PKG_CONFIG_LIBDIR=/usr/lib32/pkgconfig make -j $__jobs check" ],
+    "threads": 1
+}

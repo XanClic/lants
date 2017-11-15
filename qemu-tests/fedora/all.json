@@ -1,0 +1,3 @@
+{
+    "depends": [ "gcc-m64", "gcc-m32", "mingw64" ]
+}

@@ -1,0 +1,9 @@
+{
+    "arguments": [ "arch_host", "arch_clang_m64_dir" ],
+    "machine": "$arch_host",
+    "variable_jobs": true,
+    "depends": [ "./clean" ],
+    "workdir": "$arch_clang_m64_dir",
+    "execute": [ "make -j $__jobs" ],
+    "threads": "$__jobs"
+}
