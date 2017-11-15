@@ -267,6 +267,10 @@ class StatusScreen
     end
 
     def dir_split(list, aliased=false)
+        if list.empty?
+            return list
+        end
+
         prefixes = { '/' => true }
         copy = list.map do |le|
             le = aliased ? le : @aliases[le]
