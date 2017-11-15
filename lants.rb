@@ -167,7 +167,7 @@ class Machine
         if self.local?
             `#{cmd}`
         else
-            `ssh #{@host} #{cmd.shellescape}`
+            `ssh #{@host} #{cmd.shellescape} < /dev/null`
         end
     end
 
@@ -197,6 +197,7 @@ class Machine
                 exit 1
             else
                 line = 'ssh ' + @host.shellescape + ' ' + line.shellescape
+                line += ' < /dev/null'
                 line += ' &> ' + job_log_path(@host, job).shellescape
                 Kernel.exec('sh', '-c', line)
                 exit 1
