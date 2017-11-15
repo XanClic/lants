@@ -5,5 +5,6 @@
     "depends": [ "./clean" ],
     "workdir": "$arch_clang_m32_dir",
     "execute": [ "PKG_CONFIG_LIBDIR=/usr/lib32/pkgconfig make -j $__jobs" ],
-    "threads": "$__jobs"
+    "threads": "$__jobs",
+    "failcount": 1
 }
