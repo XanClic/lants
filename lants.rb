@@ -8,11 +8,12 @@ require 'terminfo'
 LOG_PATH = '/tmp/lants-output'
 
 
+def fname_friendly(str)
+    str.gsub('/', '__').gsub(/[^\w-]/, '_')
+end
+
 def job_fname(host, job)
-    host + '-' + job.short_name
-                    .gsub(/^\//, '')
-                    .gsub('/', '__')
-                    .gsub(/[^\w-]/, '_')
+    fname_friendly(host + '-' + job.short_name.gsub(/^\//, ''))
 end
 
 def job_log_path(host, job)
