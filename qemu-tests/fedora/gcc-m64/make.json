@@ -1,0 +1,9 @@
+{
+    "arguments": [ "fedora_host", "fedora_gcc_m64_dir" ],
+    "machine": "$fedora_host",
+    "variable_jobs": true,
+    "depends": [ "./clean" ],
+    "workdir": "$fedora_gcc_m64_dir",
+    "execute": [ "make -j $__jobs" ],
+    "threads": "$__jobs"
+}

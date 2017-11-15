@@ -1,0 +1,3 @@
+{
+    "depends": [ "fedora/gcc-m64", "arch/clang-m32" ]
+}

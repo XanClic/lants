@@ -1,0 +1,6 @@
+{
+    "arguments": [ "branch", "arch_host", "arch_qemu_dir" ],
+    "machine": "$arch_host",
+    "workdir": "$arch_qemu_dir",
+    "execute": [ "git fetch github", "git checkout github/$branch" ]
+}

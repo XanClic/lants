@@ -1,0 +1,9 @@
+{
+    "arguments": [ "arch_host", "arch_gcc_m64_dir" ],
+    "machine": "$arch_host",
+    "variable_jobs": true,
+    "depends": [ "./make" ],
+    "workdir": "$arch_gcc_m64_dir",
+    "execute": [ "make -j $__jobs check" ],
+    "threads": 1
+}

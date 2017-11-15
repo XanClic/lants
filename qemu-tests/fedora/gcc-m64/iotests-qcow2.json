@@ -1,0 +1,8 @@
+{
+    "arguments": [ "fedora_host", "fedora_gcc_m64_dir" ],
+    "machine": "$fedora_host",
+    "depends": [ "./make", "./iotests-raw-post" ],
+    "workdir": "$fedora_gcc_m64_dir/tests/qemu-iotests",
+    "execute": [ "TEST_DIR=/tmp/$__fname ./check -T -c writethrough -qcow2" ],
+    "failcount": 3
+}
