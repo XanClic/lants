@@ -1,7 +1,0 @@
-{
-    "arguments": [ "fedora_host", "fedora_gcc_m32_dir" ],
-    "machine": "$fedora_host",
-    "depends": [ "../branch" ],
-    "workdir": "$fedora_gcc_m32_dir",
-    "execute": [ "PKG_CONFIG_LIBDIR=/usr/lib/pkgconfig make clean" ]
-}

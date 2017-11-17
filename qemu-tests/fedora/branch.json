@@ -1,6 +1,6 @@
 {
-    "arguments": [ "branch", "fedora_host", "fedora_qemu_dir" ],
+    "arguments": [ "branch", "fedora_host", "git_url", "fedora_qemu_dir" ],
     "machine": "$fedora_host",
-    "workdir": "$fedora_qemu_dir",
-    "execute": [ "git checkout $branch" ]
+    "execute": [ "git clone --depth 1 -b $branch $git_url $fedora_qemu_dir",
+                 "cd $fedora_qemu_dir && scripts/git-submodule.sh update ui/keycodemapdb dtc capstone" ]
 }
