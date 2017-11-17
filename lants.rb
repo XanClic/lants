@@ -500,6 +500,8 @@ jobs_completed = []
 jobs_running = []
 job_pool = all_jobs.keys
 
+fail_retries = 0
+
 
 job_count = job_pool.size
 
@@ -586,6 +588,8 @@ while jobs_completed.size < job_count
                 stat.enqueue(job.name, "#{job.short_name} [#{job.failcount}]")
                 jobs_running -= [job.name]
                 job_pool += [job.name]
+
+                fail_retries += 1
             else
                 $stderr.puts("\n\n#{job.name} failed; see logs under " +
                              job_log_path(machine.host, job))
@@ -598,4 +602,10 @@ while jobs_completed.size < job_count
         jobs_running -= [job.name]
         jobs_completed += [job.name]
     end
+end
+
+puts
+puts('All jobs completed successfully.')
+if fail_retries > 0
+    puts("(#{fail_retries} retr#{fail_retries == 1 ? 'y' : 'ies'} because of failure)")
 end
