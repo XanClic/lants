@@ -308,7 +308,7 @@ class StatusScreen
         w = size[1]
         h = size[0]
 
-        #self.write("\e[2J\e[;H")
+        self.write("\e[2J\e[;H")
 
         self.write("%-*s%-*s%-*s%-*s\n" %
                    [w / 4, 'Done', w / 4, '| Failed',
@@ -342,6 +342,27 @@ class StatusScreen
             self.write(' ' * (w / 4) + '|' + ' ' * (w / 4 - 1) +
                        '|' + ' ' * (w / 4 - 1) + '|' + ' ' * (w / 4 - 1) + "\n")
             i += 1
+        end
+    end
+
+    def summary
+        self.write("\e[2J\e[;H")
+
+        puts("=== Done ===")
+        puts
+
+        @done.map { |d| @aliases[d] }.sort.each do |d|
+            puts(d)
+        end
+
+        if !@failed.empty?
+            puts
+            puts("=== Failed ===")
+            puts
+
+            @failed.sort.each do |f|
+                puts(f)
+            end
         end
     end
 
@@ -604,6 +625,10 @@ while jobs_completed.size < job_count
     end
 end
 
+
+stat.summary
+
+puts
 puts
 puts('All jobs completed successfully.')
 if fail_retries > 0
