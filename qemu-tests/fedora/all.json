@@ -1,3 +1,5 @@
 {
-    "depends": [ "gcc-m64", "gcc-m32", "mingw64" ]
+    "arguments": [ "fedora_qemu_dir" ],
+    "depends": [ "gcc-m64", "gcc-m32", "mingw64" ],
+    "execute": [ "rm -rf $fedora_qemu_dir" ]
 }
