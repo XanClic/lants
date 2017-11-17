@@ -93,17 +93,24 @@ class Job
         end
     end
 
-    def expand_params(str, jobs=nil)
-        args = Hash[@arguments.map { |a| [a, $params[a].gsub('$', '$$')] }]
+    def expand_params(str, shellescape=false, jobs=nil)
+        if @arguments.find { |a| $params[a].include?('$') }
+            raise 'FIXME: $ in parameters not supported yet'
+        end
+
+        args = Hash[@arguments.map { |a| [a, $params[a]] }]
         args['__jobs'] = jobs.to_s if jobs
-        args['__fname'] = job_fname(@machine, self).shellescape
+        args['__fname'] = job_fname(@machine, self)
+
+        if shellescape
+            args = Hash[args.map { |a, v| [a, v.shellescape] }]
+        end
 
         str = str.dup
         args.each do |a, v|
-            str.gsub!(/([^$])\$#{a}/, '\1' + v.gsub('\\', '\\\\'))
+            str.gsub!(/([^\\])\$#{a}/, '\1' + v.gsub('\\', '\\\\'))
             str.gsub!(/^\$#{a}/, v.gsub('\\', '\\\\'))
         end
-        str.gsub!('$$', '$')
 
         return str
     end
@@ -189,8 +196,9 @@ class Machine
     end
 
     def execute_job(job, jobs=1)
-        execution = ['cd ' + job.expand_params(job.workdir).shellescape] +
-                     job.execute.map { |l| job.expand_params(l) }
+        execution =
+            ['cd ' + job.expand_params(job.workdir, false, jobs).shellescape] +
+            job.execute.map { |l| job.expand_params(l, true, jobs) }
 
         pid = fork
         if !pid
