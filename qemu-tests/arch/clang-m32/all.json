@@ -1,6 +1,3 @@
 {
-    "depends": [ "./check",
-                 "./iotests-nbd",
-                 "./iotests-raw",
-                 "./iotests-qcow2" ]
+    "depends": [ "./check", "./iotests" ]
 }

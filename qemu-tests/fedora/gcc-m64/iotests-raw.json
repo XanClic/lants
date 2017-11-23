@@ -1,8 +1,9 @@
 {
     "arguments": [ "fedora_host", "fedora_gcc_m64_dir" ],
     "machine": "$fedora_host",
-    "depends": [ "./iotests-raw-start" ],
-    "workdir": "$fedora_gcc_m64_dir/tests/qemu-iotests",
-    "execute": [ "TEST_DIR=/tmp/$__fname ./check -T -c writethrough -raw" ],
+    "depends": [ "./make" ],
+    "workdir": "$fedora_gcc_m64_dir/tests",
+    "execute": [ "cp -rT qemu-iotests $__fname",
+                 "cd $__fname && TEST_DIR=/tmp/$__fname ./check -T -c writethrough -raw" ],
     "failcount": 3
 }
