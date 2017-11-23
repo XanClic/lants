@@ -1,8 +1,9 @@
 {
     "arguments": [ "arch_host", "arch_clang_m32_dir" ],
     "machine": "$arch_host",
-    "depends": [ "./make", "./iotests-raw-post" ],
-    "workdir": "$arch_clang_m32_dir/tests/qemu-iotests",
-    "execute": [ "TEST_DIR=/tmp/$__fname ./check -T -c writethrough -qcow2" ],
+    "depends": [ "./make" ],
+    "workdir": "$arch_clang_m32_dir/tests",
+    "execute": [ "cp -rT qemu-iotests $__fname",
+                 "cd $__fname && TEST_DIR=/tmp/$__fname ./check -T -c writethrough -qcow2" ],
     "failcount": 3
 }
