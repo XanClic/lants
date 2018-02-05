@@ -1,0 +1,11 @@
+{
+    "depends": [ "./iotests-qcow2",
+                 "./iotests-nbd",
+                 "./iotests-raw",
+                 "./iotests-qcow2-compat=0.10",
+                 "./iotests-qcow2-refcount_bits=1",
+                 "./iotests-luks",
+                 "./iotests-vmdk",
+                 "./iotests-vhdx",
+                 "./iotests-qcow" ]
+}

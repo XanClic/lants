@@ -1,0 +1,3 @@
+{
+    "depends": [ "clang-m32" ]
+}

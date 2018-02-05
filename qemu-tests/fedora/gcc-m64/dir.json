@@ -1,0 +1,6 @@
+{
+    "arguments": [ "fedora_host", "fedora_gcc_m64_dir" ],
+    "machine": "$fedora_host",
+    "depends": [ "../branch" ],
+    "execute": [ "mkdir -p $fedora_gcc_m64_dir" ]
+}
