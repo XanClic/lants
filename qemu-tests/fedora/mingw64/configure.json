@@ -1,0 +1,7 @@
+{
+    "arguments": [ "fedora_host", "fedora_mingw64_dir" ],
+    "machine": "$fedora_host",
+    "depends": [ "./dir" ],
+    "workdir": "$fedora_mingw64_dir",
+    "execute": [ "../configure --target-list=x86_64-softmmu --cross-prefix=x86_64-w64-mingw32-" ]
+}
