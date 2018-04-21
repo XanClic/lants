@@ -7,5 +7,9 @@
                  "./iotests-luks",
                  "./iotests-vmdk",
                  "./iotests-vhdx",
-                 "./iotests-qcow" ]
+                 "./iotests-qcow",
+                 "./iotests-vdi",
+                 "./iotests-vpc",
+                 "./iotests-qed",
+                 "./iotests-rare" ]
 }
