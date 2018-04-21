@@ -1,0 +1,14 @@
+{
+    "arguments": [ "fedora_host", "fedora_gcc_m64_dir" ],
+    "machine": "$fedora_host",
+    "depends": [ "./make" ],
+    "workdir": "$fedora_gcc_m64_dir/tests",
+    "execute": [
+        "cp -rT qemu-iotests $__fname",
+        "cd $__fname && TEST_DIR=/tmp/$__fname ./check -T -c writethrough -cloop",
+        "cd $__fname && TEST_DIR=/tmp/$__fname ./check -T -c writethrough -parallels",
+        "cd $__fname && TEST_DIR=/tmp/$__fname ./check -T -c writethrough -bochs",
+        "cd qemu-iotests && ./check -T -c none -qcow2 142 199"
+    ],
+    "failcount": 3
+}

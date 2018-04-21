@@ -1,0 +1,14 @@
+{
+    "arguments": [ "arch_host", "arch_clang_m32_dir" ],
+    "machine": "$arch_host",
+    "depends": [ "./make" ],
+    "workdir": "$arch_clang_m32_dir/tests",
+    "execute": [
+        "cp -rT qemu-iotests $__fname",
+        "cd $__fname && TEST_DIR=/tmp/$__fname ./check -T -c writethrough -cloop",
+        "cd $__fname && TEST_DIR=/tmp/$__fname ./check -T -c writethrough -parallels",
+        "cd $__fname && TEST_DIR=/tmp/$__fname ./check -T -c writethrough -bochs",
+        "cd qemu-iotests && ./check -T -c none -qcow2 142 199"
+    ],
+    "failcount": 3
+}
