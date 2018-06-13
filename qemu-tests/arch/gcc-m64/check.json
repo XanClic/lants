@@ -5,5 +5,6 @@
     "depends": [ "./make" ],
     "workdir": "$arch_gcc_m64_dir",
     "execute": [ "make -j $__jobs check" ],
-    "threads": 1
+    "threads": 1,
+    "failcount": 1
 }
