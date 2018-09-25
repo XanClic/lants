@@ -1,15 +1,15 @@
 {
-    "depends": [ "./iotests-qcow2",
-                 "./iotests-nbd",
-                 "./iotests-raw",
-                 "./iotests-qcow2-compat_0.10",
-                 "./iotests-qcow2-refcount_bits_1",
-                 "./iotests-luks",
-                 "./iotests-vmdk",
-                 "./iotests-vhdx",
-                 "./iotests-qcow",
-                 "./iotests-vdi",
-                 "./iotests-vpc",
-                 "./iotests-qed",
-                 "./iotests-rare" ]
+    "after": [ "./iotests-qcow2",
+               "./iotests-nbd",
+               "./iotests-raw",
+               "./iotests-qcow2-compat_0.10",
+               "./iotests-qcow2-refcount_bits_1",
+               "./iotests-luks",
+               "./iotests-vmdk",
+               "./iotests-vhdx",
+               "./iotests-qcow",
+               "./iotests-vdi",
+               "./iotests-vpc",
+               "./iotests-qed",
+               "./iotests-rare" ]
 }

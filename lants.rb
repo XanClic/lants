@@ -27,6 +27,7 @@ class Job
         @path = nil
         @short_name = nil
         @dependencies = []
+        @soft_dependencies = []
         @arguments = []
         @workdir = '/tmp'
         @execute = []
@@ -40,8 +41,13 @@ class Job
         @dependencies
     end
 
+    def soft_dependencies
+        @soft_dependencies
+    end
+
     def from(desc)
         @dependencies = desc['depends'] if desc['depends']
+        @soft_dependencies = desc['after'] if desc['after']
         @arguments = desc['arguments'] if desc['arguments']
         @workdir = desc['workdir'] if desc['workdir']
         @execute = desc['execute'] if desc['execute']
@@ -76,20 +82,27 @@ class Job
         @machine = self.expand_params(@machine)
     end
 
+    def expand_dependency(dep)
+        if dep.start_with?('/')
+            dep += '.json' unless File.exist?($rcwd + dep)
+            dep = File.realpath($rcwd + dep)
+        else
+            dep += '.json' unless File.exist?(@path + '/' + dep)
+            dep = File.realpath(@path + '/' + dep)
+        end
+        if File.directory?(dep)
+            dep += '/all.json'
+        end
+
+        return dep
+    end
+
     def expand_dependencies
         @dependencies.map! do |dep|
-            if dep.start_with?('/')
-                dep += '.json' unless File.exist?($rcwd + dep)
-                dep = File.realpath($rcwd + dep)
-            else
-                dep += '.json' unless File.exist?(@path + '/' + dep)
-                dep = File.realpath(@path + '/' + dep)
-            end
-            if File.directory?(dep)
-                dep += '/all.json'
-            end
-
-            dep
+            self.expand_dependency(dep)
+        end
+        @soft_dependencies.map! do |dep|
+            self.expand_dependency(dep)
         end
     end
 
@@ -391,6 +404,11 @@ class StatusScreen
         self.refresh
     end
 
+    def notrun(op)
+        @queue -= [op]
+        self.refresh
+    end
+
     def update_desc(op, desc)
         @aliases[op] = desc
         self.refresh
@@ -458,7 +476,7 @@ ARGV.each do |arg|
         p = arg.split('=')
         $params[p[0].strip] = (p[1..-1] * '=').strip
     else
-        root.dependencies << arg
+        root.soft_dependencies << arg
     end
 end
 
@@ -472,7 +490,7 @@ stat.enqueue(root.name, root.short_name)
 while !unloaded_deps.empty?
     job = all_jobs[unloaded_deps.shift]
 
-    job.dependencies.each do |dep|
+    (job.dependencies + job.soft_dependencies).each do |dep|
         next if all_jobs[dep]
 
         begin
@@ -518,6 +536,8 @@ end
 
 
 jobs_completed = []
+jobs_failed = []
+jobs_notrun = []
 jobs_running = []
 job_pool = all_jobs.keys
 
@@ -526,22 +546,29 @@ fail_retries = 0
 
 job_count = job_pool.size
 
-while jobs_completed.size < job_count
+while !job_pool.empty? || !jobs_running.empty?
     job = nil
 
     machines.each do |mn, machine|
         next if machine.usage > machine.cores
 
         if machine.usage < machine.cores
-            job = job_pool.find { |j| j = all_jobs[j];
-                                      j.machine == mn &&
-                                          (j.dependencies & jobs_completed) ==
-                                              j.dependencies }
+            job = job_pool.find { |j|
+                j = all_jobs[j]
+
+                j.machine == mn &&
+                    (j.dependencies & jobs_completed) == j.dependencies &&
+                    (j.soft_dependencies & job_pool).empty?
+            }
         else
-            job = job_pool.find { |j| j = all_jobs[j];
-                                      j.machine == mn && j.threads == 0 &&
-                                          (j.dependencies & jobs_completed) ==
-                                              j.dependencies }
+            job = job_pool.find { |j|
+                j = all_jobs[j]
+
+                j.machine == mn &&
+                    j.threads == 0 &&
+                    (j.dependencies & jobs_completed) == j.dependencies &&
+                    (j.soft_dependencies & job_pool).empty?
+            }
         end
         break if job
     end
@@ -551,10 +578,13 @@ while jobs_completed.size < job_count
         machine = machines[job.machine]
 
         job_ready_count =
-            job_pool.select { |j| j = all_jobs[j];
-                              j.machine == machine.host &&
-                                      (j.dependencies & jobs_completed) ==
-                                          j.dependencies }.size
+            job_pool.select { |j|
+                j = all_jobs[j]
+
+                j.machine == machine.host &&
+                    (j.dependencies & jobs_completed) == j.dependencies &&
+                    (j.soft_dependencies & job_pool).empty?
+        }.size
 
         job_jobs = 1
         if job.variable_jobs
@@ -572,6 +602,7 @@ while jobs_completed.size < job_count
             $stderr.puts('Cannot fulfill remaining dependencies:')
             job_pool.each do |job|
                 ud = job.dependencies - (job.dependencies & jobs_completed)
+                ud += job.soft_dependencies & job_pool
                 udl = ud.map { |d| all_jobs[ud].short_name } * ', '
                 $stderr.puts("#{job.short_name} -> #{udl}")
             end
@@ -601,10 +632,11 @@ while jobs_completed.size < job_count
 
             machine = machines[job.machine]
 
+            log_path = job_log_path(machine.host, job)
+            system("cp #{log_path.shellescape} " +
+                   "#{log_path.shellescape}.#{job.failcount}")
+
             if job.failcount > 0
-                log_path = job_log_path(machine.host, job)
-                system("cp #{log_path.shellescape} " +
-                       "#{log_path.shellescape}.#{job.failcount}")
                 job.failcount -= 1
                 stat.enqueue(job.name, "#{job.short_name} [#{job.failcount}]")
                 jobs_running -= [job.name]
@@ -612,9 +644,24 @@ while jobs_completed.size < job_count
 
                 fail_retries += 1
             else
-                $stderr.puts("\n\n#{job.name} failed; see logs under " +
-                             job_log_path(machine.host, job))
-                exit 1
+                jobs_running -= [job.name]
+                jobs_failed += [job.name]
+
+                skip = job_pool.select { |j|
+                    all_jobs[j].dependencies.include?(job.name)
+                }
+                while !skip.empty?
+                    skip.each do |j|
+                        stat.notrun(j)
+                    end
+
+                    jobs_notrun += skip
+                    job_pool -= skip
+
+                    skip = job_pool.select { |j|
+                        !(all_jobs[j].dependencies & skip).empty?
+                    }
+                end
             end
             next
         end
@@ -630,7 +677,21 @@ stat.summary
 
 puts
 puts
-puts('All jobs completed successfully.')
+if jobs_failed.empty? && jobs_notrun.empty?
+    puts('All jobs completed successfully.')
+else
+    puts('The following jobs failed terminally:')
+    jobs_failed.each do |j|
+        puts(' · ' + all_jobs[j].short_name)
+    end
+    puts
+
+    puts('The following jobs were not run because of failed dependencies:')
+    jobs_notrun.each do |j|
+        puts(' · ' + all_jobs[j].short_name)
+    end
+    puts
+end
 if fail_retries > 0
     puts("(#{fail_retries} retr#{fail_retries == 1 ? 'y' : 'ies'} because of failure)")
 end
