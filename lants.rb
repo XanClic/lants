@@ -558,7 +558,7 @@ while !job_pool.empty? || !jobs_running.empty?
 
                 j.machine == mn &&
                     (j.dependencies & jobs_completed) == j.dependencies &&
-                    (j.soft_dependencies & job_pool).empty?
+                    (j.soft_dependencies & (job_pool + jobs_running)).empty?
             }
         else
             job = job_pool.find { |j|
@@ -567,7 +567,7 @@ while !job_pool.empty? || !jobs_running.empty?
                 j.machine == mn &&
                     j.threads == 0 &&
                     (j.dependencies & jobs_completed) == j.dependencies &&
-                    (j.soft_dependencies & job_pool).empty?
+                    (j.soft_dependencies & (job_pool + jobs_running)).empty?
             }
         end
         break if job
@@ -583,7 +583,7 @@ while !job_pool.empty? || !jobs_running.empty?
 
                 j.machine == machine.host &&
                     (j.dependencies & jobs_completed) == j.dependencies &&
-                    (j.soft_dependencies & job_pool).empty?
+                    (j.soft_dependencies & (job_pool + jobs_running)).empty?
         }.size
 
         job_jobs = 1
@@ -602,7 +602,7 @@ while !job_pool.empty? || !jobs_running.empty?
             $stderr.puts('Cannot fulfill remaining dependencies:')
             job_pool.each do |job|
                 ud = job.dependencies - (job.dependencies & jobs_completed)
-                ud += job.soft_dependencies & job_pool
+                ud += job.soft_dependencies & (job_pool + jobs_running)
                 udl = ud.map { |d| all_jobs[ud].short_name } * ', '
                 $stderr.puts("#{job.short_name} -> #{udl}")
             end
