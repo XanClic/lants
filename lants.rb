@@ -6,6 +6,7 @@ require 'terminfo'
 
 
 LOG_PATH = '/tmp/lants-output'
+ERR_PATH = '/tmp/lants-errors'
 
 
 def fname_friendly(str)
@@ -18,6 +19,10 @@ end
 
 def job_log_path(host, job)
     LOG_PATH + '/' + job_fname(host, job)
+end
+
+def job_err_path(host, job)
+    ERR_PATH + '/' + job_fname(host, job)
 end
 
 
@@ -421,6 +426,7 @@ $params = {}
 $rcwd = File.realpath(Dir.pwd)
 
 system('mkdir -p ' + LOG_PATH.shellescape)
+system('mkdir -p ' + ERR_PATH.shellescape)
 
 root = Job.new('root')
 root.path = $rcwd
@@ -632,9 +638,8 @@ while !job_pool.empty? || !jobs_running.empty?
 
             machine = machines[job.machine]
 
-            log_path = job_log_path(machine.host, job)
-            system("cp #{log_path.shellescape} " +
-                   "#{log_path.shellescape}.#{job.failcount}")
+            system("cp #{job_log_path(machine.host, job).shellescape} " +
+                      "#{job_err_path(machine.host, job).shellescape}.#{job.failcount}")
 
             if job.failcount > 0
                 job.failcount -= 1
