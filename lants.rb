@@ -25,6 +25,39 @@ def job_err_path(host, job)
     ERR_PATH + '/' + job_fname(host, job)
 end
 
+def pad(str, width)
+    if str.length < width
+        return '%-*s' % [width, str]
+    elsif str.length > width
+        split_m = str.match(/^( *)(.*)$/)
+
+        spaces = split_m[1]
+        text = split_m[2]
+
+        text_w = width - spaces.length
+        if text_w < 5
+            if width < 5
+                text_w = width
+            else
+                text_w = 5
+            end
+        end
+        if text_w >= text.length
+            if text.length == 0
+                return ' ' * width
+            else
+                text_w = text.length
+            end
+        end
+
+        space_w = width - text_w
+
+        return spaces[0..(space_w-1)] + '…' + text[-(text_w-1)..-1]
+    else
+        return str
+    end
+end
+
 
 class Job
     def initialize(name)
@@ -329,9 +362,9 @@ class StatusScreen
         self.write("\e[2J\e[;H")
 
         self.write("%-*s%-*s%-*s%-*s\n" %
-                   [w / 4, 'Done', w / 4, '| Failed',
+                   [w / 4 - 2, 'Done', w / 4 + 2, '| Failed',
                     w / 4, '| In progress', w / 4, '| Queued'])
-        self.write('-' * (w / 4) + '+' + '-' * (w / 4 - 1) +
+        self.write('-' * (w / 4 - 2) + '+' + '-' * (w / 4 + 1) +
                    '+' + '-' * (w / 4 - 1) + '+' + '-' * (w / 4 - 1) + "\n")
 
         din = dir_split(@done)
@@ -347,17 +380,17 @@ class StatusScreen
             p = pin[i] ? pin[i] : ''
             q = qin[i] ? qin[i] : ''
 
-            self.write("%-*.*s%-*.*s%-*.*s%-*.*s\n" %
-                       [w / 4, w / 4, d,
-                        w / 4, w / 4, '| ' + f,
-                        w / 4, w / 4, '| ' + p,
-                        w / 4, w / 4, '| ' + q])
+            self.write("%s| %s| %s| %s\n" %
+                       [pad(d, w / 4 - 2),
+                        pad(f, w / 4),
+                        pad(p, w / 4 - 2),
+                        pad(q, w / 4 - 2)])
 
             i += 1
         end
 
         while i < h - 3
-            self.write(' ' * (w / 4) + '|' + ' ' * (w / 4 - 1) +
+            self.write(' ' * (w / 4 - 2) + '|' + ' ' * (w / 4 + 1) +
                        '|' + ' ' * (w / 4 - 1) + '|' + ' ' * (w / 4 - 1) + "\n")
             i += 1
         end
