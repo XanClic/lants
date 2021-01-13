@@ -1,0 +1,7 @@
+{
+    "arguments": [ "arch_host", "arch_gcc_m64_dir" ],
+    "machine": "$arch_host",
+    "depends": [ "./clean" ],
+    "workdir": "$arch_gcc_m64_dir",
+    "execute": [ "../configure --target-list=x86_64-softmmu --disable-tpm --disable-libdaxctl --disable-spice --disable-docs" ]
+}

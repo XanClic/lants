@@ -4,7 +4,7 @@
     "variable_jobs": true,
     "depends": [ "./make" ],
     "workdir": "$arch_clang_m32_dir",
-    "execute": [ "PKG_CONFIG_LIBDIR=/usr/lib32/pkgconfig make -j $__jobs check" ],
+    "execute": [ "PKG_CONFIG_LIBDIR=/usr/lib32/pkgconfig make -j $__jobs:<=8 check" ],
     "threads": 1,
     "failcount": 1
 }

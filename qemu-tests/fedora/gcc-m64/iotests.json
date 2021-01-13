@@ -4,6 +4,7 @@
                "./iotests-raw",
                "./iotests-qcow2-compat_0.10",
                "./iotests-qcow2-refcount_bits_1",
+               "./iotests-qcow2-data_file",
                "./iotests-luks",
                "./iotests-vmdk",
                "./iotests-vhdx",

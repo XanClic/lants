@@ -1,0 +1,7 @@
+{
+    "arguments": [ "arch_host", "arch_clang_m64_dir" ],
+    "machine": "$arch_host",
+    "depends": [ "./clean" ],
+    "workdir": "$arch_clang_m64_dir",
+    "execute": [ "../configure --target-list=x86_64-softmmu --cc=clang --extra-cflags='-Wno-address-of-packed-member -Wno-bool-operation -Wno-atomic-alignment -Werror' --extra-ldflags='-latomic' --disable-gtk --disable-tpm --disable-libdaxctl --disable-spice --disable-docs" ]
+}

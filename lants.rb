@@ -103,11 +103,11 @@ class Job
             if @threads < 0
                 raise ':threads must be a non-negative integer or "$__jobs"'
             end
-        elsif @threads != '$__jobs'
+        elsif !(@threads =~ /^\$__jobs(:\S+)?$/)
             raise ':threads must be a non-negative integer or "$__jobs"'
         end
 
-        if @threads == '$__jobs' && !@variable_jobs
+        if @threads.to_s.start_with?('$__jobs') && !@variable_jobs
             if @execute.empty?
                 @threads = 0
             else
@@ -157,13 +157,51 @@ class Job
             args = Hash[args.map { |a, v| [a, v.shellescape] }]
         end
 
-        str = str.dup
-        args.each do |a, v|
-            str.gsub!(/([^\\])\$#{a}/, '\1' + v.gsub('\\', '\\\\'))
-            str.gsub!(/^\$#{a}/, v.gsub('\\', '\\\\'))
+        nstr = ''
+        i = 0
+
+        while true
+            old_i = i
+            i = str.index('$', old_i)
+            if !i
+                nstr += str[old_i..-1]
+                break
+            end
+
+            nstr += str[old_i..(i-1)] if i > old_i
+            if str[i + 1] == '$'
+                nstr += '$'
+                i += 2
+                next
+            end
+
+            i += 1
+            spec = /(\w*)(:<=\d+)?/.match(str[i..-1])
+            name = spec[1]
+            limit = spec[2]
+
+            val = args[name]
+            raise 'Unknown variable: ' + name if !val
+
+            if limit
+                if limit.start_with?(':<=')
+                    begin
+                        ival = Integer(val)
+                        mval = Integer(limit[3..-1])
+                    rescue Exception => e
+                        raise "Cannot limit #{name} by #{limit}: #{e.inspect}"
+                    end
+
+                    ival = mval if ival > mval
+                    val = ival.to_s
+                end
+            end
+
+            nstr += val
+            i += spec[0].length
         end
 
-        return str
+        return nstr
     end
 
     def path
@@ -269,7 +307,7 @@ class Machine
             end
         end
 
-        threads = job.threads == '$__jobs' ? jobs : job.threads
+        threads = Integer(job.expand_params(job.threads.to_s, false, jobs))
         @running[pid] = [job.name, threads]
         @usage += threads
     end

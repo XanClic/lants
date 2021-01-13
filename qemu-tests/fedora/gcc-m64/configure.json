@@ -3,5 +3,5 @@
     "machine": "$fedora_host",
     "depends": [ "./dir" ],
     "workdir": "$fedora_gcc_m64_dir",
-    "execute": [ "../configure --target-list=x86_64-softmmu" ]
+    "execute": [ "../configure --target-list=x86_64-softmmu --disable-tpm" ]
 }
