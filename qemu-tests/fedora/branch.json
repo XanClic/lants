@@ -2,5 +2,5 @@
     "arguments": [ "branch", "fedora_host", "git_url", "fedora_qemu_dir" ],
     "machine": "$fedora_host",
     "execute": [ "git clone --depth 1 -b $branch $git_url $fedora_qemu_dir",
-                 "cd $fedora_qemu_dir && scripts/git-submodule.sh update ui/keycodemapdb dtc capstone" ]
+                 "cd $fedora_qemu_dir && scripts/git-submodule.sh update ui/keycodemapdb tests/fp/berkeley-testfloat-3 tests/fp/berkeley-softfloat-3 dtc capstone slirp" ]
 }

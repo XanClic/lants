@@ -8,7 +8,7 @@
         "cd $__fname && TEST_DIR=/tmp/$__fname ./check -T -c writethrough -cloop",
         "cd $__fname && TEST_DIR=/tmp/$__fname ./check -T -c writethrough -parallels",
         "cd $__fname && TEST_DIR=/tmp/$__fname ./check -T -c writethrough -bochs",
-        "cd qemu-iotests && ./check -T -c none -qcow2 142 199"
+        "cd qemu-iotests && mkdir -p $__fname && TEST_DIR=\"$$PWD\"/$__fname ./check -T -c none -qcow2 142 199"
     ],
     "failcount": 3
 }

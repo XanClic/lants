@@ -1,0 +1,7 @@
+{
+    "arguments": [ "arch_host", "arch_clang_m32_dir" ],
+    "machine": "$arch_host",
+    "depends": [ "./clean" ],
+    "workdir": "$arch_clang_m32_dir",
+    "execute": [ "PKG_CONFIG_LIBDIR=/usr/lib32/pkgconfig ../configure --target-list=i386-softmmu --cc=clang --extra-cflags='-Wno-address-of-packed-member -Wno-bool-operation -Wno-atomic-alignment -Werror -m32' --extra-ldflags='-m32 -latomic' --disable-gtk --disable-tpm --disable-libdaxctl --disable-vnc --disable-spice --disable-docs --disable-fdt" ]
+}

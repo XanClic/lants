@@ -3,5 +3,5 @@
     "machine": "$fedora_host",
     "depends": [ "./dir" ],
     "workdir": "$fedora_gcc_m32_dir",
-    "execute": [ "PKG_CONFIG_LIBDIR=/usr/lib/pkgconfig ../configure --target-list=i386-softmmu --extra-cflags=-m32 --extra-ldflags=-m32" ]
+    "execute": [ "PKG_CONFIG_LIBDIR=/usr/lib/pkgconfig ../configure --target-list=i386-softmmu --extra-cflags=-m32 --extra-ldflags=-m32 --disable-tpm --disable-vnc" ]
 }

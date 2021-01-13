@@ -3,5 +3,5 @@
     "machine": "$arch_host",
     "depends": [ "../branch" ],
     "workdir": "$arch_gcc_m64_dir",
-    "execute": [ "make clean" ]
+    "execute": [ "rm -rf -- * || true" ]
 }

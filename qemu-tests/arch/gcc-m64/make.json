@@ -2,9 +2,9 @@
     "arguments": [ "arch_host", "arch_gcc_m64_dir" ],
     "machine": "$arch_host",
     "variable_jobs": true,
-    "depends": [ "./clean" ],
+    "depends": [ "./configure" ],
     "workdir": "$arch_gcc_m64_dir",
-    "execute": [ "make -j $__jobs" ],
-    "threads": "$__jobs",
+    "execute": [ "make -j $__jobs:<=8" ],
+    "threads": "$__jobs:<=8",
     "failcount": 1
 }

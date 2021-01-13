@@ -4,6 +4,6 @@
     "depends": [ "./make" ],
     "workdir": "$fedora_gcc_m64_dir/tests",
     "execute": [ "cp -rT qemu-iotests $__fname",
-                 "cd $__fname && TEST_DIR=/tmp/$__fname ./check -T -c writethrough -x auto -qcow2" ],
+                 "cd $__fname && TEST_DIR=/tmp/$__fname ./check -T -c writethrough -qcow2 -o data_file='$$TEST_IMG.ext_data_file'" ],
     "failcount": 3
 }
