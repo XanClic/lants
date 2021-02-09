@@ -4,6 +4,6 @@
     "depends": [ "./make" ],
     "workdir": "$arch_clang_m32_dir/tests",
     "execute": [ "cp -rT qemu-iotests $__fname",
-                 "cd $__fname && TEST_DIR=/tmp/$__fname ./check -T -c writethrough -raw" ],
+                 "cd $__fname && TEST_DIR=/tmp/$__fname ./check -c writethrough -raw" ],
     "failcount": 3
 }
